@@ -15,13 +15,13 @@ exit 1
 while getopts :dra o; do
     case "${o}" in
         d)
-            delete = true
+            delete=true
             ;;
         r)
-            rd = true
+            rd=true
             ;;
         a)  
-            archive = true
+            archive=true
             ;;
         :)  
             echo "ERROR: Option -$OPTARG requires an argument"
@@ -43,13 +43,15 @@ if [$(id -u) -eq 0];then
     if [$# -ne 0]; then
         for user in $@; do
             echo "Procesando usuario: $user"
-            if id -u "$user" > /dev/null 2>&1; then
-                if[(id -u $user)> -gt 999]; then
+            if id -u "$user" > /dev/null 2>&1 ; then
+                if [$(id -u $user) -gt 999]; then
                     if [$archive]; then
                         if [! /archive/]; then
                             mkdir /archive/
-                         echo "Creando directorio /archive";
+                         echo "Creando directorio /archive"
                         fi
+                        echo "Archivando /archive/$user a /archive/$user.tgz"
+                        tar czvz /archive/$user.tgz /home/$user > dev/null 2>&1
                     fi
                     if [ $rd]; then
                         rm -rf /home/$user
@@ -69,14 +71,14 @@ if [$(id -u) -eq 0];then
                     fi
                     if  [ ! $archive] && [! $rd] && [! $delete]; then
                         usermode -L $user
-                        echo "La cuenta $user ha sido deshabilitada.";
+                        echo "La cuenta $user ha sido deshabilitada."
                     fi
 
                 else
-                    echo "No se puede eliminat el $user .";
+                    echo "No se puede eliminat el $user ."
             fi
-        done        
-    else
+        fi        
+    done
         usage
     fi
 
@@ -84,4 +86,3 @@ else
     echo "Porfavor inicia con root o sudo";exit 1
 
 fi
- 
